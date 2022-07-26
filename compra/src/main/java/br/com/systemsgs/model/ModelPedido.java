@@ -30,26 +30,26 @@ public class ModelPedido implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nome deve ser Informado!")
+    @NotBlank
     private String nome;
 
-    @NotNull(message = "Produto não deve ser Nulo!")
-    @Min(value = 1, message = "Minimo deve ser 1")
+    @NotNull
+    @Min(1)
     private Long produto;
 
-    @NotNull(message = "Valor não deve ser Nulo!")
-    @Min(value = 1, message = "Valor deve ser maior que 0!")
+    @NotNull
+    @Min(1)
     private BigDecimal valor;
 
-    @NotNull(message = "Data não deve ser Nula!")
+    @NotNull
     @JsonFormat(pattern = "yyyy-mm-dd")
     private Date dataCompra;
 
     @CPF(message = "Cpf Inválido!")
-    @NotBlank(message = "Cpf deve ser Informado!")
+    @NotBlank
     private String cpfCliente;
 
-    @NotBlank(message = "Cep deve ser Informado!")
+    @NotBlank
     private String cep;
 
 }
