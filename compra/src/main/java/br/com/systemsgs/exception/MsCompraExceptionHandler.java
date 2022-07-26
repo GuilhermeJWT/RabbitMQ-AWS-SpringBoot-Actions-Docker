@@ -2,8 +2,8 @@ package br.com.systemsgs.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
-import com.mscompra.service.exception.EntidadeNaoEncontradaException;
-import com.mscompra.service.exception.NegocioException;
+import br.com.systemsgs.exception.EntidadeNaoEncontradaException;
+import br.com.systemsgs.exception.NegocioException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -74,7 +74,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         ProblemType problemType = ProblemType.DADOS_INVALIDOS;
         String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
 
-        List<ProblemException.Object> problemObjects = bindingResult.getAllErrors().stream()
+        List<Problem.Object> problemObjects = bindingResult.getAllErrors().stream()
                 .map(objectError -> {
                     String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
 
@@ -84,14 +84,14 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
                         name = ((FieldError) objectError).getField();
                     }
 
-                    return ProblemException.Object.builder()
+                    return Problem.Object.builder()
                             .name(name)
                             .userMessage(message)
                             .build();
                 })
                 .collect(Collectors.toList());
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
                 .objects(problemObjects)
                 .build();
@@ -107,7 +107,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
 
         log.error(ex.getMessage());
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
                 .build();
 
@@ -123,7 +123,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         String detail = String.format("O recurso %s, que você tentou acessar, é inexistente.",
                 ex.getRequestURL());
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                 .build();
 
@@ -152,7 +152,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
                         + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
                 ex.getName(), ex.getValue(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName());
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                 .build();
 
@@ -174,7 +174,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         ProblemType problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL;
         String detail = "O corpo da requisição está inválido. Verifique erro de sintaxe.";
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                 .build();
 
@@ -190,7 +190,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         String detail = String.format("A propriedade '%s' não existe. "
                 + "Corrija ou remova essa propriedade e tente novamente.", path);
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                 .build();
 
@@ -207,7 +207,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
                         + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
                 path, ex.getValue(), ex.getTargetType().getSimpleName());
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                 .build();
 
@@ -222,7 +222,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         ProblemType problemType = ProblemType.RECURSO_NAO_ENCONTRADO;
         String detail = ex.getMessage();
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
                 .build();
 
@@ -236,7 +236,7 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         ProblemType problemType = ProblemType.ERRO_NEGOCIO;
         String detail = ex.getMessage();
 
-        ProblemException problem = createProblemBuilder(status, problemType, detail)
+        Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
                 .build();
 
@@ -248,14 +248,14 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
                                                              HttpStatus status, WebRequest request) {
 
         if (body == null) {
-            body = ProblemException.builder()
+            body = Problem.builder()
                     .timestamp(OffsetDateTime.now())
                     .title(status.getReasonPhrase())
                     .status(status.value())
                     .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                     .build();
         } else if (body instanceof String) {
-            body = ProblemException.builder()
+            body = Problem.builder()
                     .timestamp(OffsetDateTime.now())
                     .title((String) body)
                     .status(status.value())
@@ -266,10 +266,10 @@ public class MsCompraExceptionHandler extends ResponseEntityExceptionHandler{
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 
-    private ProblemException.ProblemBuilder createProblemBuilder(HttpStatus status,
+    private Problem.ProblemBuilder createProblemBuilder(HttpStatus status,
                                                         ProblemType problemType, String detail) {
 
-        return ProblemException.builder()
+        return Problem.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .type(problemType.getUri())

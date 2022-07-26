@@ -45,7 +45,6 @@ public class ModelPedido implements Serializable {
     @JsonFormat(pattern = "yyyy-mm-dd")
     private Date dataCompra;
 
-    @CPF(message = "Cpf Inválido!")
     @NotBlank
     private String cpfCliente;
 
